@@ -1,3 +1,4 @@
+import * as dotenv from "dotenv";
 import { SESClient } from "@aws-sdk/client-ses";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 
@@ -39,12 +40,15 @@ const createSendEmailCommand = (toAddress, fromAddress) => {
 };
 
 export const handler = async (event) => {
+  dotenv.config();
+  const env = process.env;
+  console.log(env.EMAIL_ADMIN);
   const REGION = "ap-northeast-1";
   const sesClient = new SESClient({ region: REGION });
 
   const params = {
-    Source: "hoge@gmail.com",
-    Destination: { ToAddresses: ["hoge@gmail.com"] },
+    Source: env.EMAIL_ADMIN,
+    Destination: { ToAddresses: [env.EMAIL_ADMIN] },
     Message: {
       Subject: { Data: "subject hogehoge" },
       Body: {
