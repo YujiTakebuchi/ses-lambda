@@ -67,6 +67,7 @@ export const handler = async (event) => {
     return await sesClient.send(sendEmailCommand);
   } catch (e) {
     console.error("Failed to send email.");
+    console.error(e);
     return e;
   }
   // // TODO implement
