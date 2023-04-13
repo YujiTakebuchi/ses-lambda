@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 import { SESClient } from "@aws-sdk/client-ses";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 
@@ -40,28 +40,31 @@ const createSendEmailCommand = (toAddress, fromAddress) => {
 };
 
 export const handler = async (event) => {
-  dotenv.config();
   const env = process.env;
-  console.log(env.EMAIL_ADMIN);
   const REGION = "ap-northeast-1";
-  const sesClient = new SESClient({ region: REGION });
+  const sesClient = new SESClient({
+    region: REGION,
+    endpoint: env.LOCALSTACK_HOSTNAME
+      ? `http://${env.LOCALSTACK_HOSTNAME}:4566`
+      : "host.docker.internal:4566",
+  });
 
-  const params = {
-    Source: env.EMAIL_ADMIN,
-    Destination: { ToAddresses: [env.EMAIL_ADMIN] },
-    Message: {
-      Subject: { Data: "subject hogehoge" },
-      Body: {
-        Text: { Data: "body message hogehoge" },
-      },
-    },
-  };
+  // const params = {
+  //   Source: env.EMAIL_ADMIN,
+  //   Destination: { ToAddresses: [env.EMAIL_ADMIN] },
+  //   Message: {
+  //     Subject: { Data: "subject hogehoge" },
+  //     Body: {
+  //       Text: { Data: "body message hogehoge" },
+  //     },
+  //   },
+  // };
 
-  const sendEmailCommand = new SendEmailCommand(params);
-  // const sendEmailCommand = createSendEmailCommand(
-  //   "hoge@example.com",
-  //   "sender@example.com"
-  // );
+  // const sendEmailCommand = new SendEmailCommand(params);
+  const sendEmailCommand = createSendEmailCommand(
+    env.EMAIL_ADMIN,
+    env.EMAIL_ADMIN
+  );
 
   try {
     return await sesClient.send(sendEmailCommand);
