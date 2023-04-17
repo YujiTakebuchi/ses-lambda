@@ -47,7 +47,7 @@ export const handler = async (event) => {
     region: REGION,
     endpoint: env.LOCALSTACK_HOSTNAME
       ? `http://${env.LOCALSTACK_HOSTNAME}:4566`
-      : "host.docker.internal:4566",
+      : null,
   });
 
   // const params = {
