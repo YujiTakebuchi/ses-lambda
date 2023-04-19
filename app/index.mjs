@@ -5,19 +5,11 @@ import { SendEmailCommand } from "@aws-sdk/client-ses";
 const createSendEmailCommand = (toAddress, fromAddress) => {
   return new SendEmailCommand({
     Destination: {
-      /* required */
-      CcAddresses: [
-        /* more items */
-      ],
-      ToAddresses: [
-        toAddress,
-        /* more To-email addresses */
-      ],
+      CcAddresses: [],
+      ToAddresses: [toAddress],
     },
     Message: {
-      /* required */
       Body: {
-        /* required */
         Html: {
           Charset: "UTF-8",
           Data: "HTML_FORMAT_BODY",
@@ -33,9 +25,7 @@ const createSendEmailCommand = (toAddress, fromAddress) => {
       },
     },
     Source: fromAddress,
-    ReplyToAddresses: [
-      /* more items */
-    ],
+    ReplyToAddresses: [],
   });
 };
 
@@ -50,18 +40,6 @@ export const handler = async (event) => {
       : null,
   });
 
-  // const params = {
-  //   Source: env.EMAIL_ADMIN,
-  //   Destination: { ToAddresses: [env.EMAIL_ADMIN] },
-  //   Message: {
-  //     Subject: { Data: "subject hogehoge" },
-  //     Body: {
-  //       Text: { Data: "body message hogehoge" },
-  //     },
-  //   },
-  // };
-
-  // const sendEmailCommand = new SendEmailCommand(params);
   const sendEmailCommand = createSendEmailCommand(
     env.EMAIL_ADMIN,
     env.EMAIL_ADMIN
@@ -74,10 +52,4 @@ export const handler = async (event) => {
     console.error(e);
     return e;
   }
-  // // TODO implement
-  // const response = {
-  //     statusCode: 200,
-  //     body: JSON.stringify('Hello from Lambda!'),
-  // };
-  // return response;
 };
