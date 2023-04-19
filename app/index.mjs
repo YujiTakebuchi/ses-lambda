@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { VerifyEmailIdentityCommand } from "@aws-sdk/client-ses";
 import { SESClient } from "@aws-sdk/client-ses";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 
@@ -29,6 +30,10 @@ const createSendEmailCommand = (toAddress, fromAddress) => {
   });
 };
 
+const createVerifyEmailIdentityCommand = (emailAddress) => {
+  return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
+};
+
 export const handler = async (event) => {
   dotenv.config();
   const env = process.env;
@@ -40,16 +45,33 @@ export const handler = async (event) => {
       : null,
   });
 
+  const verifyEmailIdentityCommand = createVerifyEmailIdentityCommand(
+    env.EMAIL_ADMIN
+  );
   const sendEmailCommand = createSendEmailCommand(
     env.EMAIL_ADMIN,
     env.EMAIL_ADMIN
   );
 
-  try {
-    return await sesClient.send(sendEmailCommand);
-  } catch (e) {
-    console.error("Failed to send email.");
-    console.error(e);
-    return e;
-  }
+  // try {
+  //   return await sesClient.send(verifyEmailIdentityCommand);
+  // } catch (e) {
+  //   console.error("Failed to send email.");
+  //   console.error(e);
+  //   return e;
+  // }
+  return sesClient
+    .send(verifyEmailIdentityCommand)
+    .then(() => {
+      return sesClient.send(sendEmailCommand);
+    })
+    .then((res) => {
+      console.log("Success to send email.");
+      return res;
+    })
+    .catch((err) => {
+      console.error("Failed to send email.");
+      console.error(e);
+      return e;
+    });
 };
