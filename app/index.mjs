@@ -48,13 +48,10 @@ export const handler = async (event) => {
       : null,
   });
 
-  const verifyEmailIdentityCommand = createVerifyEmailIdentityCommand(
-    env.EMAIL_ADMIN
-  );
-  const sendEmailCommand = createSendEmailCommand(
-    env.EMAIL_ADMIN,
-    env.EMAIL_ADMIN
-  );
+  const emailAdmin = env.EMAIL_ADMIN;
+  const verifyEmailIdentityCommand =
+    createVerifyEmailIdentityCommand(emailAdmin);
+  const sendEmailCommand = createSendEmailCommand(emailAdmin, emailAdmin);
 
   const verifiedCheckInput = undefined;
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
