@@ -37,7 +37,7 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
 export const handler = async (event) => {
   dotenv.config();
   const env = process.env;
-  const REGION = "ap-northeast-1";
+  const REGION = env.AWS_REGION;
   const sesClient = new SESClient({
     region: REGION,
     endpoint: env.LOCALSTACK_HOSTNAME
