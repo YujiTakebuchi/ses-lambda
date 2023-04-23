@@ -37,6 +37,27 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
 };
 
+const verifyAndSendEmailSes = (sesClient, emailAddress) => {
+  const sendEmailCommand = createSendEmailCommand(emailAdmin, emailAdmin);
+  const verifyEmailIdentityCommand =
+    createVerifyEmailIdentityCommand(emailAdmin);
+
+  return sesClient
+    .send(verifyEmailIdentityCommand)
+    .then(() => {
+      return sesClient.send(sendEmailCommand);
+    })
+    .then((res) => {
+      console.log("Success to send email.");
+      return res;
+    })
+    .catch((err) => {
+      console.error("Failed to send email.");
+      console.error(err);
+      return err;
+    });
+};
+
 export const handler = async (event) => {
   dotenv.config();
   const env = process.env;
