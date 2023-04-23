@@ -61,20 +61,33 @@ export const handler = async (event) => {
   return sesClient.send(verifiedCheckCommand).then((res) => {
     console.log(res);
     const verifiedEmailList = res.VerifiedEmailAddresses;
-    return verifiedEmailList.includes(emailAdmin) ? 
-    sesClient
-    // .send(verifyEmailIdentityCommand)
-    // .then(() => {
-    //   return sesClient.send(sendEmailCommand);
-    // })
-    // .then((res) => {
-    //   console.log("Success to send email.");
-    //   return res;
-    // })
-    // .catch((err) => {
-    //   console.error("Failed to send email.");
-    //   console.error(err);
-    //   return err;
-    // });
+    return verifiedEmailList.includes(emailAdmin)
+      ? sesClient
+          .send(sendEmailCommand)
+          .then((res) => {
+            console.log("Success to send email.");
+            console.log("veried admin e-mail address");
+            return res;
+          })
+          .catch((err) => {
+            console.error("Failed to send email.");
+            console.error(err);
+            return err;
+          })
+      : sesClient
+          .send(verifyEmailIdentityCommand)
+          .then(() => {
+            return sesClient.send(sendEmailCommand);
+          })
+          .then((res) => {
+            console.log("Success to send email.");
+            console.log("veried admin e-mail address");
+            return res;
+          })
+          .catch((err) => {
+            console.error("Failed to send email.");
+            console.error(err);
+            return err;
+          });
   });
 };
