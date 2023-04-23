@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import {
   SESClient,
+  ListVerifiedEmailAddressesCommand,
   VerifyEmailIdentityCommand,
   SendEmailCommand,
 } from "@aws-sdk/client-ses";
@@ -55,18 +56,27 @@ export const handler = async (event) => {
     env.EMAIL_ADMIN
   );
 
-  return sesClient
-    .send(verifyEmailIdentityCommand)
-    .then(() => {
-      return sesClient.send(sendEmailCommand);
-    })
-    .then((res) => {
-      console.log("Success to send email.");
-      return res;
-    })
-    .catch((err) => {
-      console.error("Failed to send email.");
-      console.error(err);
-      return err;
-    });
+  const verifiedCheckInput = undefined;
+  const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
+    verifiedCheckInput
+  );
+
+  return sesClient.send(verifiedCheckCommand).then((res) => {
+    console.log(res);
+    const verifiedEmailList = res.VerifiedEmailAddresses;
+    return res;
+  });
+  // .send(verifyEmailIdentityCommand)
+  // .then(() => {
+  //   return sesClient.send(sendEmailCommand);
+  // })
+  // .then((res) => {
+  //   console.log("Success to send email.");
+  //   return res;
+  // })
+  // .catch((err) => {
+  //   console.error("Failed to send email.");
+  //   console.error(err);
+  //   return err;
+  // });
 };
