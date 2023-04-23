@@ -53,13 +53,6 @@ export const handler = async (event) => {
     env.EMAIL_ADMIN
   );
 
-  // try {
-  //   return await sesClient.send(verifyEmailIdentityCommand);
-  // } catch (e) {
-  //   console.error("Failed to send email.");
-  //   console.error(e);
-  //   return e;
-  // }
   return sesClient
     .send(verifyEmailIdentityCommand)
     .then(() => {
