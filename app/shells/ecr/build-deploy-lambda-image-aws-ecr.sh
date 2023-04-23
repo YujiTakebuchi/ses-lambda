@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./shells/build-handler-image.sh
-./shells/deploy-handler-aws-ecr.sh
+./shells/ecr/build-handler-image.sh
+./shells/ecr/deploy-handler-aws-ecr.sh
