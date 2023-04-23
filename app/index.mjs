@@ -1,7 +1,9 @@
 import dotenv from "dotenv";
-import { VerifyEmailIdentityCommand } from "@aws-sdk/client-ses";
-import { SESClient } from "@aws-sdk/client-ses";
-import { SendEmailCommand } from "@aws-sdk/client-ses";
+import {
+  SESClient,
+  VerifyEmailIdentityCommand,
+  SendEmailCommand,
+} from "@aws-sdk/client-ses";
 
 const createSendEmailCommand = (toAddress, fromAddress) => {
   return new SendEmailCommand({
