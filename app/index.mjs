@@ -64,7 +64,7 @@ export const handler = async (event) => {
     })
     .catch((err) => {
       console.error("Failed to send email.");
-      console.error(e);
-      return e;
+      console.error(err);
+      return err;
     });
 };
