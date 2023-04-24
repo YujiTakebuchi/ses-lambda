@@ -88,9 +88,6 @@ export const handler = async (event) => {
   });
 
   const emailAdmin = env.EMAIL_ADMIN;
-  const verifyEmailIdentityCommand =
-    createVerifyEmailIdentityCommand(emailAdmin);
-  const sendEmailCommand = createSendEmailCommand(emailAdmin, emailAdmin);
 
   const verifiedCheckInput = undefined;
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
