@@ -6,7 +6,7 @@ import {
   SendEmailCommand,
 } from "@aws-sdk/client-ses";
 
-const createSendEmailCommand = (toAddress, fromAddress) => {
+const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   return new SendEmailCommand({
     Destination: {
       CcAddresses: [],
@@ -16,16 +16,16 @@ const createSendEmailCommand = (toAddress, fromAddress) => {
       Body: {
         Html: {
           Charset: "UTF-8",
-          Data: "HTML_FORMAT_BODY",
+          Data: contentObj?.html ?? "HTML_FORMAT_BODY",
         },
         Text: {
           Charset: "UTF-8",
-          Data: "TEXT_FORMAT_BODY",
+          Data: contentObj?.text ?? "TEXT_FORMAT_BODY",
         },
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "EMAIL_SUBJECT",
+        Data: contentObj?.subject ?? "EMAIL_SUBJECT",
       },
     },
     Source: fromAddress,
@@ -77,6 +77,7 @@ const sendEmailSes = (sesClient, emailAddress) => {
 };
 
 export const handler = async (event) => {
+  console.log(event);
   dotenv.config();
   const env = process.env;
   const REGION = env.AWS_REGION;
@@ -96,8 +97,9 @@ export const handler = async (event) => {
 
   return sesClient.send(verifiedCheckCommand).then((res) => {
     const verifiedEmailList = res.VerifiedEmailAddresses;
-    return verifiedEmailList.includes(emailAdmin)
-      ? sendEmailSes(sesClient, emailAdmin)
-      : verifyAndSendEmailSes(sesClient, emailAdmin);
+    return event;
+    // return verifiedEmailList.includes(emailAdmin)
+    //   ? sendEmailSes(sesClient, emailAdmin)
+    //   : verifyAndSendEmailSes(sesClient, emailAdmin);
   });
 };
