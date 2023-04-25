@@ -3,14 +3,14 @@
 while (( $# > 0 ))
 do
   case $1 in
-    --paylaod | --payload=*)
-      if [[ "$1" =~ ^--paylaod= ]]; then
-        PAYLOAD=$(echo $1 | sed -e 's/^--paylaod=//')
+    --payload | --payload=*)
+      if [[ "$1" =~ ^--payload= ]]; then
+        PAYLOAD=$(echo $1 | sed -e 's/^--payload=//')
       elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-        echo "'paylaod' requires an argument." 1>&2
+        echo "'payload' requires an argument." 1>&2
         exit 1
       else
-        PAYLOAD="--payload $2"
+        PAYLOAD="--payload '$2' --cli-binary-format raw-in-base64-out"
         shift
       fi
       ;;
@@ -19,4 +19,9 @@ do
 done
 
 ./shells/localstack/create-func-localstack.sh
-./shells/localstack/invoke-func-localstack.sh $PAYLOAD
+
+if [ -n "$PAYLOAD" ]; then
+    `echo ./shells/localstack/invoke-func-localstack.sh ${PAYLOAD}`
+else
+    ./shells/localstack/invoke-func-localstack.sh
+fi
