@@ -8,6 +8,7 @@ AWS の Lambda 開発をラクにできる様にするために色々試した�
 
 - node.js v18
 - AWS CLI v2
+- AWS ECR(Elastic Container Registry)
 - AWS Lambda
 - AWS SES(Simple Email Service)
 - Docker
@@ -86,3 +87,18 @@ docker-compose up -d
 
 - `create-invoke-localstack.sh`: 関数の作成、実行 (作成時に関数の Status が Pending 状態になるため実行は失敗する)
 - `update-func-localstack.sh`: 関数の更新、実行
+
+## 本番環境へのビルドデプロイ
+
+シンプル(別スクリプト統合していない)なスクリプト
+
+- `app/shells/ecr/build-handler-image.sh`: Docker イメージのビルド
+- `app/shells/ecr/deploy-handler-aws-ecr.sh`: 本番環境 ECR へのデプロイ
+
+別スクリプトを統合したスクリプト
+
+- `build-deploy-lambda-image-aws-ecr.sh`: Docker イメージのビルド、ECR へのデプロイ
+
+その後
+
+- AWS コンソールにログインして Lambda にアクセス、新しいイメージのデプロイから latest バージョンを設定
