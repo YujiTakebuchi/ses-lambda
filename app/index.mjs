@@ -95,11 +95,21 @@ export const handler = async (event) => {
     verifiedCheckInput
   );
 
-  return sesClient.send(verifiedCheckCommand).then((res) => {
-    const verifiedEmailList = res.VerifiedEmailAddresses;
-    return event;
-    // return verifiedEmailList.includes(emailAdmin)
-    //   ? sendEmailSes(sesClient, emailAdmin)
-    //   : verifyAndSendEmailSes(sesClient, emailAdmin);
-  });
+  return sesClient
+    .send(verifiedCheckCommand)
+    .then((res) => {
+      const verifiedEmailList = res.VerifiedEmailAddresses;
+      return verifiedEmailList.includes(emailAdmin)
+        ? sendEmailSes(sesClient, emailAdmin)
+        : verifyAndSendEmailSes(sesClient, emailAdmin);
+    })
+    .then(() => {
+      return sendEmailSes(emailAdmin, emailAdmin);
+    })
+    .then(() => {
+      console.log("send mail complete");
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 };
