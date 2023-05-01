@@ -5,6 +5,7 @@ import {
   VerifyEmailIdentityCommand,
   SendEmailCommand,
 } from "@aws-sdk/client-ses";
+import { checkInvalidMailAddressFormat } from "./validation.mjs";
 
 const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   return new SendEmailCommand({
@@ -86,7 +87,7 @@ const sendEmailSes = (sesClient, emailAddress, mailObject) => {
     });
 };
 
-export const handler = async (event) => {
+export const handler = (event, context, callback) => {
   console.log(event);
   const eventClone = event;
   dotenv.config();
@@ -100,6 +101,7 @@ export const handler = async (event) => {
   });
 
   const emailAdmin = env.EMAIL_ADMIN;
+  checkInvalidMailAddressFormat(emailAdmin, callback);
 
   const verifiedCheckInput = undefined;
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
