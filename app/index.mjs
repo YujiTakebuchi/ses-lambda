@@ -37,8 +37,12 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
 };
 
-const verifyAndSendEmailSes = (sesClient, emailAddress) => {
-  const sendEmailCommand = createSendEmailCommand(emailAddress, emailAddress);
+const verifyAndSendEmailSes = (sesClient, emailAddress, mailObject) => {
+  const sendEmailCommand = createSendEmailCommand(
+    emailAddress,
+    emailAddress,
+    mailObject
+  );
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(emailAddress);
 
@@ -59,8 +63,14 @@ const verifyAndSendEmailSes = (sesClient, emailAddress) => {
     });
 };
 
-const sendEmailSes = (sesClient, emailAddress) => {
-  const sendEmailCommand = createSendEmailCommand(emailAddress, emailAddress);
+const sendEmailSes = (sesClient, emailAddress, mailObject) => {
+  const sendEmailCommand = createSendEmailCommand(
+    emailAddress,
+    emailAddress,
+    mailObject
+  );
+  console.log("sendFunc");
+  console.log(mailObject);
 
   return sesClient
     .send(sendEmailCommand)
@@ -78,6 +88,7 @@ const sendEmailSes = (sesClient, emailAddress) => {
 
 export const handler = async (event) => {
   console.log(event);
+  const eventClone = event;
   dotenv.config();
   const env = process.env;
   const REGION = env.AWS_REGION;
@@ -100,8 +111,8 @@ export const handler = async (event) => {
     .then((res) => {
       const verifiedEmailList = res.VerifiedEmailAddresses;
       return verifiedEmailList.includes(emailAdmin)
-        ? sendEmailSes(sesClient, emailAdmin)
-        : verifyAndSendEmailSes(sesClient, emailAdmin);
+        ? sendEmailSes(sesClient, emailAdmin, eventClone)
+        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone);
     })
     .then(() => {
       console.log("send mail complete");
