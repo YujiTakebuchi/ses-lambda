@@ -88,7 +88,6 @@ const sendEmailSes = (sesClient, emailAddress, mailObject) => {
 };
 
 export const handler = (event, context, callback) => {
-  console.log(event);
   const eventClone = event;
   dotenv.config();
   const env = process.env;
