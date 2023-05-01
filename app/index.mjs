@@ -104,9 +104,6 @@ export const handler = async (event) => {
         : verifyAndSendEmailSes(sesClient, emailAdmin);
     })
     .then(() => {
-      return sendEmailSes(emailAdmin, emailAdmin);
-    })
-    .then(() => {
       console.log("send mail complete");
     })
     .catch((err) => {
