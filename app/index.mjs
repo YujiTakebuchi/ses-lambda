@@ -70,8 +70,6 @@ const sendEmailSes = (sesClient, emailAddress, mailObject) => {
     emailAddress,
     mailObject
   );
-  console.log("sendFunc");
-  console.log(mailObject);
 
   return sesClient
     .send(sendEmailCommand)
