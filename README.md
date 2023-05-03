@@ -68,6 +68,18 @@ cd app
 docker-compose up -d
 ```
 
+## ファイル構成
+
+`ses-lambda`<br>
+`app`<br>
+|- `shells`<br>
+| |- `ecr`: 本番環境へのイメージのビルド&デプロイ用シェルスクリプトを置いてるディレクトリ、詳細は本番環境へのビルドデプロイ項目に記載<br>
+| |- `localstack`: LocalStack 環境への関数の作成、更新、実行用シェルスクリプトを置いてるディレクトリ、詳細は本番環境へのビルドデプロイ項目に記載<br>
+|- `docker-compose.yml`: LocalStack 環境構築用 docker-compose ファイル<br>
+|- `Dockerfile`: 本番環境 Lambda で動作するイメージ作成用 Dockerfile<br>
+|- `index.mjs`: エントリポイント、主な処理はここで実行<br>
+|- `validation.mjs`: バリデーションチェック用モジュール<br>
+
 ## 実行
 
 ### ローカルでの検証
