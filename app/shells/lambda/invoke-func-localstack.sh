@@ -19,7 +19,7 @@ shift
 done
 
 if [ -n "$PAYLOAD" ]; then
-    `echo awslocal lambda invoke --function-name ses-lambda --region ap-northeast-1 ${PAYLOAD} result.log`
+    `echo aws lambda invoke --function-name ses-lambda --region ap-northeast-1 ${PAYLOAD} result.log`
 else
-    awslocal lambda invoke --function-name ses-lambda --region ap-northeast-1 result.log
+    aws lambda invoke --function-name ses-lambda --region ap-northeast-1 result.log
 fi
