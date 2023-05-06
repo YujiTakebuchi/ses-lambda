@@ -18,10 +18,10 @@ do
   shift
 done
 
-./shells/localstack/update-func-localstack.sh
+./shells/lambda/update-func-lambda.sh
 
 if [ -n "$PAYLOAD" ]; then
-    `echo ./shells/localstack/invoke-func-localstack.sh ${PAYLOAD}`
+    `echo ./shells/lambda/invoke-func-lambda.sh ${PAYLOAD}`
 else
-    ./shells/localstack/invoke-func-localstack.sh
+    ./shells/lambda/invoke-func-lambda.sh
 fi
