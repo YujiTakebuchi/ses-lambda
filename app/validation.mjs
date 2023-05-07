@@ -13,3 +13,18 @@ export const checkInvalidMailAddressFormat = (mailAddress, callback) => {
   }
   return null;
 };
+
+export const checkVoidString = (str, callback) => {
+  if (!str) {
+    const voidStringError = {
+      statusCode: 400,
+      body: {
+        errorMessage: "テキストが未入力です。",
+      },
+    };
+    const resJson = JSON.stringify(voidStringError);
+    callback(resJson);
+    return resJson;
+  }
+  return null;
+};

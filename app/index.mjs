@@ -5,7 +5,10 @@ import {
   VerifyEmailIdentityCommand,
   SendEmailCommand,
 } from "@aws-sdk/client-ses";
-import { checkInvalidMailAddressFormat } from "./validation.mjs";
+import {
+  checkInvalidMailAddressFormat,
+  checkVoidString,
+} from "./validation.mjs";
 
 const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   return new SendEmailCommand({
@@ -99,6 +102,11 @@ export const handler = (event, context, callback) => {
 
   const emailAdmin = env.EMAIL_ADMIN;
   checkInvalidMailAddressFormat(emailAdmin, callback);
+
+  // 空文字チェック、TODO:func 後で関数でまとめられる様に
+  checkVoidString(eventClone.html, callback);
+  checkVoidString(eventClone.subject, callback);
+  checkVoidString(eventClone.text, callback);
 
   const verifiedCheckInput = undefined;
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
