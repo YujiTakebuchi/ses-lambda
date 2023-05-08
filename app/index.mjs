@@ -41,7 +41,12 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
 };
 
-const verifyAndSendEmailSes = (sesClient, emailAddress, mailObject) => {
+const verifyAndSendEmailSes = (
+  sesClient,
+  emailAddress,
+  mailObject,
+  callback
+) => {
   const sendEmailCommand = createSendEmailCommand(
     emailAddress,
     emailAddress,
@@ -63,7 +68,16 @@ const verifyAndSendEmailSes = (sesClient, emailAddress, mailObject) => {
     .catch((err) => {
       console.error("Failed to send email.");
       console.error(err);
-      return err;
+      const awsError = {
+        statusCode: 500,
+        body: {
+          errorMessage:
+            "メールアドレス検証、またはメール送信に問題がありました。Lambdaのログを確認してください。",
+        },
+      };
+      const resJson = JSON.stringify(awsError);
+      callback(resJson);
+      return resJson;
     });
 };
 
@@ -84,7 +98,15 @@ const sendEmailSes = (sesClient, emailAddress, mailObject) => {
     .catch((err) => {
       console.error("Failed to send email.");
       console.error(err);
-      return err;
+      const awsError = {
+        statusCode: 500,
+        body: {
+          errorMessage:
+            "メール送信に問題がありました。Lambdaのログを確認してください。",
+        },
+      };
+      const resJson = JSON.stringify(awsError);
+      return resJson;
     });
 };
 
@@ -126,5 +148,14 @@ export const handler = (event, context, callback) => {
     })
     .catch((err) => {
       console.error(err);
+      const awsError = {
+        statusCode: 500,
+        body: {
+          errorMessage:
+            "メール検証済みチェックに問題がありました。Lambdaのログを確認してください。",
+        },
+      };
+      const resJson = JSON.stringify(awsError);
+      return resJson;
     });
 };
