@@ -81,7 +81,7 @@ const verifyAndSendEmailSes = (
     });
 };
 
-const sendEmailSes = (sesClient, emailAddress, mailObject) => {
+const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
   const sendEmailCommand = createSendEmailCommand(
     emailAddress,
     emailAddress,
@@ -106,6 +106,7 @@ const sendEmailSes = (sesClient, emailAddress, mailObject) => {
         },
       };
       const resJson = JSON.stringify(awsError);
+      callback(resJson);
       return resJson;
     });
 };
@@ -140,8 +141,8 @@ export const handler = (event, context, callback) => {
     .then((res) => {
       const verifiedEmailList = res.VerifiedEmailAddresses;
       return verifiedEmailList.includes(emailAdmin)
-        ? sendEmailSes(sesClient, emailAdmin, eventClone)
-        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone);
+        ? sendEmailSes(sesClient, emailAdmin, eventClone, callback)
+        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone, callback);
     })
     .then(() => {
       console.log("send mail complete");
