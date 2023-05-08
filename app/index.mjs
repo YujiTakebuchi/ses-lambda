@@ -117,13 +117,18 @@ const confirmVerifiedAndSendEmailSes = (
   mailObject,
   callback
 ) => {
+  const verifiedCheckInput = undefined;
+  const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
+    verifiedCheckInput
+  );
+
   return sesClient
     .send(verifiedCheckCommand)
     .then((res) => {
       const verifiedEmailList = res.VerifiedEmailAddresses;
-      return verifiedEmailList.includes(emailAdmin)
-        ? sendEmailSes(sesClient, emailAdmin, eventClone, callback)
-        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone, callback);
+      return verifiedEmailList.includes(mailAddress)
+        ? sendEmailSes(sesClient, mailAddress, mailObject, callback)
+        : verifyAndSendEmailSes(sesClient, mailAddress, mailObject, callback);
     })
     .then(() => {
       console.log("send mail complete");
@@ -162,8 +167,10 @@ export const handler = (event, context, callback) => {
   checkVoidString(eventClone.subject, callback);
   checkVoidString(eventClone.text, callback);
 
-  const verifiedCheckInput = undefined;
-  const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
-    verifiedCheckInput
+  return confirmVerifiedAndSendEmailSes(
+    sesClient,
+    emailAdmin,
+    eventClone,
+    callback
   );
 };
