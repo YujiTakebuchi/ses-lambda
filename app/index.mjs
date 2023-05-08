@@ -111,6 +111,37 @@ const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
     });
 };
 
+const confirmVerifiedAndSendEmailSes = (
+  sesClient,
+  mailAddress,
+  mailObject,
+  callback
+) => {
+  return sesClient
+    .send(verifiedCheckCommand)
+    .then((res) => {
+      const verifiedEmailList = res.VerifiedEmailAddresses;
+      return verifiedEmailList.includes(emailAdmin)
+        ? sendEmailSes(sesClient, emailAdmin, eventClone, callback)
+        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone, callback);
+    })
+    .then(() => {
+      console.log("send mail complete");
+    })
+    .catch((err) => {
+      console.error(err);
+      const awsError = {
+        statusCode: 500,
+        body: {
+          errorMessage:
+            "メール検証済みチェックに問題がありました。Lambdaのログを確認してください。",
+        },
+      };
+      const resJson = JSON.stringify(awsError);
+      return resJson;
+    });
+};
+
 export const handler = (event, context, callback) => {
   const eventClone = event;
   dotenv.config();
@@ -135,28 +166,4 @@ export const handler = (event, context, callback) => {
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
     verifiedCheckInput
   );
-
-  return sesClient
-    .send(verifiedCheckCommand)
-    .then((res) => {
-      const verifiedEmailList = res.VerifiedEmailAddresses;
-      return verifiedEmailList.includes(emailAdmin)
-        ? sendEmailSes(sesClient, emailAdmin, eventClone, callback)
-        : verifyAndSendEmailSes(sesClient, emailAdmin, eventClone, callback);
-    })
-    .then(() => {
-      console.log("send mail complete");
-    })
-    .catch((err) => {
-      console.error(err);
-      const awsError = {
-        statusCode: 500,
-        body: {
-          errorMessage:
-            "メール検証済みチェックに問題がありました。Lambdaのログを確認してください。",
-        },
-      };
-      const resJson = JSON.stringify(awsError);
-      return resJson;
-    });
 };
