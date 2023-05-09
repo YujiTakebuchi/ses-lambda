@@ -79,29 +79,6 @@ const verifyEmailAddressSes = (
     });
 };
 
-const verifyAndSendEmailSes = (
-  sesClient,
-  emailAddress,
-  mailObject,
-  callback
-) => {
-  const sendEmailCommand = createSendEmailCommand(
-    emailAddress,
-    emailAddress,
-    mailObject
-  );
-
-  return verifyEmailAddressSes(sesClient, emailAddress, mailObject, callback)
-    .then(() => {
-      return sendEmailSes(sesClient, emailAddress, mailObject, callback);
-    })
-    .catch((err) => {
-      console.error("Failed to send email.");
-      console.error(err);
-      return err;
-    });
-};
-
 const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
   const sendEmailCommand = createSendEmailCommand(
     emailAddress,
@@ -136,6 +113,23 @@ const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
       const resJson = JSON.stringify(awsError);
       callback(resJson);
       return resJson;
+    });
+};
+
+const verifyAndSendEmailSes = (
+  sesClient,
+  emailAddress,
+  mailObject,
+  callback
+) => {
+  return verifyEmailAddressSes(sesClient, emailAddress, mailObject, callback)
+    .then(() => {
+      return sendEmailSes(sesClient, emailAddress, mailObject, callback);
+    })
+    .catch((err) => {
+      console.error("Failed to send email.");
+      console.error(err);
+      return err;
     });
 };
 
