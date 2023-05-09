@@ -41,30 +41,17 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
 };
 
-const verifyAndSendEmailSes = (
+const verifyEmailAddressSes = (
   sesClient,
   emailAddress,
   mailObject,
   callback
 ) => {
-  const sendEmailCommand = createSendEmailCommand(
-    emailAddress,
-    emailAddress,
-    mailObject
-  );
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(emailAddress);
-
   return sesClient
     .send(verifyEmailIdentityCommand)
-    .then((res) => {
-      const sendEmailRes = sendEmailSes(
-        sesClient,
-        emailAddress,
-        mailObject,
-        callback
-      );
-      if (sendEmailRes.statusCode === 500) callback(sendEmailRes);
+    .then(() => {
       const successRes = {
         statusCode: 200,
         body: {
@@ -72,6 +59,8 @@ const verifyAndSendEmailSes = (
         },
       };
       const resJson = JSON.stringify(successRes);
+      console.log("Success to verify email addmin");
+      console.log(successRes);
       return resJson;
     })
     .catch((err) => {
@@ -87,6 +76,29 @@ const verifyAndSendEmailSes = (
       const resJson = JSON.stringify(awsError);
       callback(resJson);
       return resJson;
+    });
+};
+
+const verifyAndSendEmailSes = (
+  sesClient,
+  emailAddress,
+  mailObject,
+  callback
+) => {
+  const sendEmailCommand = createSendEmailCommand(
+    emailAddress,
+    emailAddress,
+    mailObject
+  );
+
+  return verifyEmailAddressSes(sesClient, emailAddress, mailObject, callback)
+    .then(() => {
+      return sendEmailSes(sesClient, emailAddress, mailObject, callback);
+    })
+    .catch((err) => {
+      console.error("Failed to send email.");
+      console.error(err);
+      return err;
     });
 };
 
