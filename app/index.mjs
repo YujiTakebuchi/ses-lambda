@@ -152,8 +152,9 @@ const confirmVerifiedAndSendEmailSes = (
         ? sendEmailSes(sesClient, mailAddress, mailObject, callback)
         : verifyAndSendEmailSes(sesClient, mailAddress, mailObject, callback);
     })
-    .then(() => {
+    .then((res) => {
       console.log("send mail complete");
+      return res;
     })
     .catch((err) => {
       console.error(err);
