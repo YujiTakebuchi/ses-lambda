@@ -51,7 +51,9 @@ const verifyEmailAddressSes = (
     createVerifyEmailIdentityCommand(emailAddress);
   return sesClient
     .send(verifyEmailIdentityCommand)
-    .then(() => {
+    .then((res) => {
+      console.log("Success to verify email addmin");
+      console.log(res);
       const successRes = {
         statusCode: 200,
         body: {
@@ -59,8 +61,6 @@ const verifyEmailAddressSes = (
         },
       };
       const resJson = JSON.stringify(successRes);
-      console.log("Success to verify email addmin");
-      console.log(successRes);
       return resJson;
     })
     .catch((err) => {
@@ -113,8 +113,15 @@ const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
     .send(sendEmailCommand)
     .then((res) => {
       console.log("Success to send email.");
-      console.log("verified");
-      return res;
+      console.log(res);
+      const successRes = {
+        statusCode: 200,
+        body: {
+          errorMessage: "メール送信成功",
+        },
+      };
+      const resJson = JSON.stringify(successRes);
+      return resJson;
     })
     .catch((err) => {
       console.error("Failed to send email.");
