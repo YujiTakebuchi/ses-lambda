@@ -57,13 +57,22 @@ const verifyAndSendEmailSes = (
 
   return sesClient
     .send(verifyEmailIdentityCommand)
-    .then(() => {
-      return sesClient.send(sendEmailCommand);
-    })
     .then((res) => {
-      console.log("Success to send email.");
-      console.log("not verified");
-      return res;
+      const sendEmailRes = sendEmailSes(
+        sesClient,
+        emailAddress,
+        mailObject,
+        callback
+      );
+      if (sendEmailRes.statusCode === 500) callback(sendEmailRes);
+      const successRes = {
+        statusCode: 200,
+        body: {
+          errorMessage: "メールアドレス検証成功",
+        },
+      };
+      const resJson = JSON.stringify(successRes);
+      return resJson;
     })
     .catch((err) => {
       console.error("Failed to send email.");
@@ -72,7 +81,7 @@ const verifyAndSendEmailSes = (
         statusCode: 500,
         body: {
           errorMessage:
-            "メールアドレス検証、またはメール送信に問題がありました。Lambdaのログを確認してください。",
+            "メールアドレス検証に問題がありました。Lambdaのログを確認してください。",
         },
       };
       const resJson = JSON.stringify(awsError);
