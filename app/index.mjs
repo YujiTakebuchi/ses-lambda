@@ -41,12 +41,7 @@ const createVerifyEmailIdentityCommand = (emailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
 };
 
-const verifyEmailAddressSes = (
-  sesClient,
-  emailAddress,
-  mailObject,
-  callback
-) => {
+const verifyEmailAddressSes = (sesClient, emailAddress, callback) => {
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(emailAddress);
   return sesClient
