@@ -82,11 +82,13 @@ docker-compose up -d
 
 ## 実行
 
-### ローカルでの検証
+`app` ディレクトリ直下での実行が前提になります。
 
 - `app/shells/localstack`: ローカル環境での検証用のスクリプト置き場
 - `app/shells/lambda`: 本番 AWS 環境へのビルド&デプロイスクリプト置き場
 - `app/shells/ecr`: リアル AWS 環境での検証用スクリプト置き場
+
+### ローカルでの検証
 
 **`app/shells/localstack`**
 
@@ -101,7 +103,7 @@ docker-compose up -d
 - `create-invoke-localstack.sh`: 関数の作成、実行 (作成時に関数の Status が Pending 状態になるため実行は失敗する)
 - `update-invoke-localstack.sh`: 関数の更新、実行
 
-## 本番環境へのビルドデプロイ(zip ファイル)
+### 本番環境へのビルドデプロイ(zip ファイル)
 
 **`app/shells/lambda`**
 
@@ -115,7 +117,7 @@ docker-compose up -d
 
 - `update-invoke-lambda.sh`: 関数の更新、実行
 
-## 本番環境へのビルドデプロイ(Docker イメージ)
+### 本番環境へのビルドデプロイ(Docker イメージ)
 
 シンプル(別スクリプト統合していない)なスクリプト
 
