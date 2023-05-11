@@ -178,10 +178,10 @@ export const handler = (event, context, callback) => {
   });
 
   const emailAdmin = env.EMAIL_ADMIN;
-  checkInvalidMailAddressFormat(emailAdmin, callback);
 
   // 空文字チェック、TODO:func 後で関数でまとめられる様に
   return Promise.all([
+    checkInvalidMailAddressFormat(emailAdmin),
     checkVoidString(eventClone.html),
     checkVoidString(eventClone.subject),
     checkVoidString(eventClone.text),
