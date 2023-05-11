@@ -181,14 +181,25 @@ export const handler = (event, context, callback) => {
   checkInvalidMailAddressFormat(emailAdmin, callback);
 
   // 空文字チェック、TODO:func 後で関数でまとめられる様に
-  checkVoidString(eventClone.html, callback);
-  checkVoidString(eventClone.subject, callback);
-  checkVoidString(eventClone.text, callback);
-
-  return confirmVerifiedAndSendEmailSes(
-    sesClient,
-    emailAdmin,
-    eventClone,
-    callback
-  );
+  return Promise.all([
+    checkVoidString(eventClone.html),
+    checkVoidString(eventClone.subject),
+    checkVoidString(eventClone.text),
+  ])
+    .then((data) => {
+      console.log("Success! valid values!");
+      console.log(data);
+      return confirmVerifiedAndSendEmailSes(
+        sesClient,
+        emailAdmin,
+        eventClone,
+        callback
+      );
+    })
+    .catch((err) => {
+      console.error("Failure...! invalid values!");
+      console.error(err);
+      callback(null, err);
+      return err;
+    });
 };
