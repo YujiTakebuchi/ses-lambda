@@ -84,7 +84,8 @@ docker-compose up -d
 
 ### ローカルでの検証
 
-- `app/shells/localstack`: ローカル環境での検証用のスクリプト置き場<br>
+- `app/shells/localstack`: ローカル環境での検証用のスクリプト置き場
+- `app/shells/lambda`: 本番 AWS 環境へのビルド&デプロイスクリプト置き場
 - `app/shells/ecr`: リアル AWS 環境での検証用スクリプト置き場
 
 **`app/shells/localstack`**
@@ -93,14 +94,28 @@ docker-compose up -d
 
 - `create-func-localstack.sh`: 関数の作成
 - `update-func-localstack.sh`: 関数の更新
-- `create-invoke-localstack.sh`: 関数の実行
+- `invoke-func-localstack.sh`: 関数の実行
 
 別スクリプトを統合したスクリプト
 
 - `create-invoke-localstack.sh`: 関数の作成、実行 (作成時に関数の Status が Pending 状態になるため実行は失敗する)
-- `update-func-localstack.sh`: 関数の更新、実行
+- `update-invoke-localstack.sh`: 関数の更新、実行
 
-## 本番環境へのビルドデプロイ
+## 本番環境へのビルドデプロイ(zip ファイル)
+
+**`app/shells/lambda`**
+
+シンプル(別スクリプト統合していない)なスクリプト
+
+- `create-func-lambda.sh`: 関数の作成
+- `update-func-lambda.sh`: 関数の更新
+- `invoke-func-lambda.sh`: 関数の実行
+
+別スクリプトを統合したスクリプト
+
+- `update-invoke-lambda.sh`: 関数の更新、実行
+
+## 本番環境へのビルドデプロイ(Docker イメージ)
 
 シンプル(別スクリプト統合していない)なスクリプト
 
