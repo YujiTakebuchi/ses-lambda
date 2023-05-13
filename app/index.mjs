@@ -37,13 +37,14 @@ const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   });
 };
 
-const createVerifyEmailIdentityCommand = (emailAddress) => {
-  return new VerifyEmailIdentityCommand({ EmailAddress: emailAddress });
+const createVerifyEmailIdentityCommand = (mailAddress) => {
+  return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
 };
 
-const verifyEmailAddressSes = (sesClient, emailAddress, callback) => {
+const verifyEmailAddressSes = ({ sesClient, mailAddress, callback }) => {
   const verifyEmailIdentityCommand =
-    createVerifyEmailIdentityCommand(emailAddress);
+    createVerifyEmailIdentityCommand(mailAddress);
+  console.log(mailAddress);
   return sesClient
     .send(verifyEmailIdentityCommand)
     .then((res) => {
@@ -74,10 +75,10 @@ const verifyEmailAddressSes = (sesClient, emailAddress, callback) => {
     });
 };
 
-const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
+const sendEmailSes = ({ mailObject, sesClient, mailAddress, callback }) => {
   const sendEmailCommand = createSendEmailCommand(
-    emailAddress,
-    emailAddress,
+    mailAddress,
+    mailAddress,
     mailObject
   );
 
@@ -111,15 +112,20 @@ const sendEmailSes = (sesClient, emailAddress, mailObject, callback) => {
     });
 };
 
-const verifyAndSendEmailSes = (
+const verifyAndSendEmailSes = ({
   sesClient,
-  emailAddress,
+  mailAddress,
   mailObject,
-  callback
-) => {
-  return verifyEmailAddressSes(sesClient, emailAddress, mailObject, callback)
+  callback,
+}) => {
+  return verifyEmailAddressSes({
+    sesClient,
+    mailAddress,
+    mailObject,
+    callback,
+  })
     .then(() => {
-      return sendEmailSes(sesClient, emailAddress, mailObject, callback);
+      return sendEmailSes({ sesClient, mailAddress, mailObject, callback });
     })
     .catch((err) => {
       console.error("Failed to send email.");
@@ -128,24 +134,19 @@ const verifyAndSendEmailSes = (
     });
 };
 
-const confirmVerifiedAndSendEmailSes = (
-  sesClient,
-  mailAddress,
-  mailObject,
-  callback
-) => {
+const confirmVerifiedAndSendEmailSes = ({ mailObject, ...sesSet }) => {
   const verifiedCheckInput = undefined;
   const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
     verifiedCheckInput
   );
 
-  return sesClient
+  return sesSet.sesClient
     .send(verifiedCheckCommand)
     .then((res) => {
       const verifiedEmailList = res.VerifiedEmailAddresses;
-      return verifiedEmailList.includes(mailAddress)
-        ? sendEmailSes(sesClient, mailAddress, mailObject, callback)
-        : verifyAndSendEmailSes(sesClient, mailAddress, mailObject, callback);
+      return verifiedEmailList.includes(sesSet.mailAddress)
+        ? sendEmailSes({ mailObject, ...sesSet })
+        : verifyAndSendEmailSes({ mailObject, ...sesSet });
     })
     .then((res) => {
       console.log("send mail complete");
@@ -179,6 +180,12 @@ export const handler = (event, context, callback) => {
 
   const emailAdmin = env.EMAIL_ADMIN;
 
+  const sesSet = {
+    sesClient,
+    mailAddress: emailAdmin,
+    callback,
+  };
+
   return Promise.all([
     checkInvalidMailAddressFormat(emailAdmin),
     checkVoidString(eventClone.html),
@@ -188,12 +195,10 @@ export const handler = (event, context, callback) => {
     .then((data) => {
       console.log("Success! valid values!");
       console.log(data);
-      return confirmVerifiedAndSendEmailSes(
-        sesClient,
-        emailAdmin,
-        eventClone,
-        callback
-      );
+      return confirmVerifiedAndSendEmailSes({
+        mailObject: eventClone,
+        ...sesSet,
+      });
     })
     .catch((err) => {
       console.error("Failure...! invalid values!");
