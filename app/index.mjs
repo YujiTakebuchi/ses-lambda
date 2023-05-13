@@ -112,20 +112,13 @@ const sendEmailSes = ({ mailObject, sesClient, mailAddress, callback }) => {
     });
 };
 
-const verifyAndSendEmailSes = ({
-  sesClient,
-  mailAddress,
-  mailObject,
-  callback,
-}) => {
+const verifyAndSendEmailSes = ({ mailObject, ...sesSet }) => {
   return verifyEmailAddressSes({
-    sesClient,
-    mailAddress,
     mailObject,
-    callback,
+    ...sesSet,
   })
     .then(() => {
-      return sendEmailSes({ sesClient, mailAddress, mailObject, callback });
+      return sendEmailSes({ mailObject, ...sesSet });
     })
     .catch((err) => {
       console.error("Failed to send email.");
