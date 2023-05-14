@@ -153,7 +153,7 @@ const confirmVerifiedAndSendEmailSes = ({ mailObject, ...sesSet }) => {
         },
       };
       const resJson = JSON.stringify(awsError);
-      return resJson;
+      throw new Error(resJson);
     });
 };
 
@@ -193,7 +193,7 @@ export const handler = (event, context, callback) => {
     .catch((err) => {
       console.error("Failure...! invalid values!");
       console.error(err);
-      callback(null, err);
+      callback(err);
       return err;
     });
 };
