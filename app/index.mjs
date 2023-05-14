@@ -41,7 +41,7 @@ const createVerifyEmailIdentityCommand = (mailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
 };
 
-const verifyEmailAddressSes = ({ sesClient, mailAddress, callback }) => {
+const verifyEmailAddressSes = async ({ sesClient, mailAddress }) => {
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(mailAddress);
   console.log(mailAddress);
@@ -70,12 +70,11 @@ const verifyEmailAddressSes = ({ sesClient, mailAddress, callback }) => {
         },
       };
       const resJson = JSON.stringify(awsError);
-      callback(resJson);
-      return resJson;
+      throw new Error(resJson);
     });
 };
 
-const sendEmailSes = ({ mailObject, sesClient, mailAddress, callback }) => {
+const sendEmailSes = async ({ mailObject, sesClient, mailAddress }) => {
   const sendEmailCommand = createSendEmailCommand(
     mailAddress,
     mailAddress,
@@ -107,8 +106,7 @@ const sendEmailSes = ({ mailObject, sesClient, mailAddress, callback }) => {
         },
       };
       const resJson = JSON.stringify(awsError);
-      callback(resJson);
-      return resJson;
+      throw new Error(resJson);
     });
 };
 
