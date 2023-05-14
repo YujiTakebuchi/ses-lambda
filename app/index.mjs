@@ -174,7 +174,6 @@ export const handler = (event, context, callback) => {
   const sesSet = {
     sesClient,
     mailAddress: emailAdmin,
-    callback,
   };
 
   return Promise.all([
