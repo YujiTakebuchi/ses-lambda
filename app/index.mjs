@@ -9,6 +9,16 @@ import {
   checkInvalidMailAddressFormat,
   checkVoidString,
 } from "./validation.mjs";
+import { confirmVerifiedAndSendEmailSes } from "./aws/SesModules.mjs";
+
+const verifiedCheckInput = undefined;
+const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
+  verifiedCheckInput
+);
+
+const createVerifyEmailIdentityCommand = (mailAddress) => {
+  return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
+};
 
 const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   return new SendEmailCommand({
@@ -37,128 +47,6 @@ const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   });
 };
 
-const createVerifyEmailIdentityCommand = (mailAddress) => {
-  return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
-};
-
-const verifyEmailAddressSes = ({ sesClient, mailAddress, callback }) => {
-  const verifyEmailIdentityCommand =
-    createVerifyEmailIdentityCommand(mailAddress);
-  console.log(mailAddress);
-  return sesClient
-    .send(verifyEmailIdentityCommand)
-    .then((res) => {
-      console.log("Success to verify email addmin");
-      console.log(res);
-      const successRes = {
-        statusCode: 200,
-        body: {
-          errorMessage: "メールアドレス検証成功",
-        },
-      };
-      const resJson = JSON.stringify(successRes);
-      return resJson;
-    })
-    .catch((err) => {
-      console.error("Failed to send email.");
-      console.error(err);
-      const awsError = {
-        statusCode: 500,
-        body: {
-          errorMessage:
-            "メールアドレス検証に問題がありました。Lambdaのログを確認してください。",
-        },
-      };
-      const resJson = JSON.stringify(awsError);
-      callback(resJson);
-      return resJson;
-    });
-};
-
-const sendEmailSes = ({ mailObject, sesClient, mailAddress, callback }) => {
-  const sendEmailCommand = createSendEmailCommand(
-    mailAddress,
-    mailAddress,
-    mailObject
-  );
-
-  return sesClient
-    .send(sendEmailCommand)
-    .then((res) => {
-      console.log("Success to send email.");
-      console.log(res);
-      const successRes = {
-        statusCode: 200,
-        body: {
-          errorMessage: "メール送信成功",
-        },
-      };
-      const resJson = JSON.stringify(successRes);
-      return resJson;
-    })
-    .catch((err) => {
-      console.error("Failed to send email.");
-      console.error(err);
-      const awsError = {
-        statusCode: 500,
-        body: {
-          errorMessage:
-            "メール送信に問題がありました。Lambdaのログを確認してください。",
-        },
-      };
-      const resJson = JSON.stringify(awsError);
-      callback(resJson);
-      return resJson;
-    });
-};
-
-const verifyAndSendEmailSes = ({ mailObject, ...sesSet }) => {
-  return verifyEmailAddressSes({
-    mailObject,
-    ...sesSet,
-  })
-    .then(() => {
-      return sendEmailSes({ mailObject, ...sesSet });
-    })
-    .catch((err) => {
-      console.error("Failed to send email.");
-      console.error(err);
-      return err;
-    });
-};
-
-const confirmVerifiedAndSendEmailSes = ({ mailObject, ...sesSet }) => {
-  const verifiedCheckInput = undefined;
-  const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
-    verifiedCheckInput
-  );
-
-  return sesSet.sesClient
-    .send(verifiedCheckCommand)
-    .then((res) => {
-      const verifiedEmailList = res.VerifiedEmailAddresses;
-      return verifiedEmailList.includes(sesSet.mailAddress)
-        ? sendEmailSes({ mailObject, ...sesSet })
-        : verifyAndSendEmailSes({ mailObject, ...sesSet });
-    })
-    .then((res) => {
-      console.log("send mail complete");
-      return res;
-    })
-    .catch((err) => {
-      console.error(err);
-      const awsError = {
-        statusCode: 500,
-        body: {
-          errorMessage:
-            "メール検証済みチェックに問題がありました。Lambdaのログを確認してください。",
-        },
-      };
-      const resJson = JSON.stringify(awsError);
-      return resJson;
-    });
-};
-
 export const handler = (event, context, callback) => {
   const eventClone = event;
   dotenv.config();
@@ -173,11 +61,13 @@ export const handler = (event, context, callback) => {
 
   const emailAdmin = env.EMAIL_ADMIN;
 
-  const sesSet = {
-    sesClient,
-    mailAddress: emailAdmin,
-    callback,
-  };
+  const verifyEmailIdentityCommand =
+    createVerifyEmailIdentityCommand(emailAdmin);
+  const sendEmailCommand = createSendEmailCommand(
+    emailAdmin,
+    emailAdmin,
+    eventClone
+  );
 
   return Promise.all([
     checkInvalidMailAddressFormat(emailAdmin),
@@ -190,13 +80,17 @@ export const handler = (event, context, callback) => {
       console.log(data);
       return confirmVerifiedAndSendEmailSes({
         mailObject: eventClone,
-        ...sesSet,
+        verifiedCheckCommand,
+        verifyEmailIdentityCommand,
+        sendEmailCommand,
+        mailAddress: emailAdmin,
+        sesClient,
       });
     })
     .catch((err) => {
       console.error("Failure...! invalid values!");
       console.error(err);
-      callback(null, err);
+      callback(err);
       return err;
     });
 };
