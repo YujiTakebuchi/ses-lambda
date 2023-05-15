@@ -2,10 +2,8 @@ import { ListVerifiedEmailAddressesCommand } from "@aws-sdk/client-ses";
 
 export const verifyEmailAddressSes = async ({
   sesClient,
-  mailAddress,
   verifyEmailIdentityCommand,
 }) => {
-  console.log(mailAddress);
   return sesClient
     .send(verifyEmailIdentityCommand)
     .then((res) => {
@@ -35,12 +33,7 @@ export const verifyEmailAddressSes = async ({
     });
 };
 
-export const sendEmailSes = async ({
-  mailObject,
-  sesClient,
-  mailAddress,
-  sendEmailCommand,
-}) => {
+export const sendEmailSes = async ({ sesClient, sendEmailCommand }) => {
   return sesClient
     .send(sendEmailCommand)
     .then((res) => {
@@ -74,15 +67,15 @@ export const verifyAndSendEmailSes = ({
   mailObject,
   verifyEmailIdentityCommand,
   sendEmailCommand,
-  ...sesSet
+  sesClient,
 }) => {
   return verifyEmailAddressSes({
     mailObject,
     verifyEmailIdentityCommand,
-    ...sesSet,
+    sesClient,
   })
     .then(() => {
-      return sendEmailSes({ mailObject, sendEmailCommand, ...sesSet });
+      return sendEmailSes({ sendEmailCommand, sesClient });
     })
     .catch((err) => {
       console.error("Failed to send email.");
@@ -96,19 +89,20 @@ export const confirmVerifiedAndSendEmailSes = ({
   verifiedCheckCommand,
   verifyEmailIdentityCommand,
   sendEmailCommand,
-  ...sesSet
+  mailAddress,
+  sesClient,
 }) => {
-  return sesSet.sesClient
+  return sesClient
     .send(verifiedCheckCommand)
     .then((res) => {
       const verifiedEmailList = res.VerifiedEmailAddresses;
-      return verifiedEmailList.includes(sesSet.mailAddress)
-        ? sendEmailSes({ mailObject, sendEmailCommand, ...sesSet })
+      return verifiedEmailList.includes(mailAddress)
+        ? sendEmailSes({ mailObject, sendEmailCommand, sesClient })
         : verifyAndSendEmailSes({
             mailObject,
             verifyEmailIdentityCommand,
             sendEmailCommand,
-            ...sesSet,
+            sesClient,
           });
     })
     .then((res) => {

@@ -61,11 +61,6 @@ export const handler = (event, context, callback) => {
 
   const emailAdmin = env.EMAIL_ADMIN;
 
-  const sesSet = {
-    sesClient,
-    mailAddress: emailAdmin,
-  };
-
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(emailAdmin);
   const sendEmailCommand = createSendEmailCommand(
@@ -88,7 +83,8 @@ export const handler = (event, context, callback) => {
         verifiedCheckCommand,
         verifyEmailIdentityCommand,
         sendEmailCommand,
-        ...sesSet,
+        mailAddress: emailAdmin,
+        sesClient,
       });
     })
     .catch((err) => {
