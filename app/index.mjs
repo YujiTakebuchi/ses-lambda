@@ -11,6 +11,15 @@ import {
 } from "./validation.mjs";
 import { confirmVerifiedAndSendEmailSes } from "./aws/SesModules.mjs";
 
+const verifiedCheckInput = undefined;
+const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
+  verifiedCheckInput
+);
+
+const createVerifyEmailIdentityCommand = (mailAddress) => {
+  return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
+};
+
 const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
   return new SendEmailCommand({
     Destination: {
@@ -36,10 +45,6 @@ const createSendEmailCommand = (toAddress, fromAddress, contentObj) => {
     Source: fromAddress,
     ReplyToAddresses: [],
   });
-};
-
-const createVerifyEmailIdentityCommand = (mailAddress) => {
-  return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
 };
 
 export const handler = (event, context, callback) => {
@@ -80,6 +85,7 @@ export const handler = (event, context, callback) => {
       console.log(data);
       return confirmVerifiedAndSendEmailSes({
         mailObject: eventClone,
+        verifiedCheckCommand,
         verifyEmailIdentityCommand,
         sendEmailCommand,
         ...sesSet,

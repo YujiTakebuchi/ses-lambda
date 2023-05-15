@@ -93,15 +93,11 @@ export const verifyAndSendEmailSes = ({
 
 export const confirmVerifiedAndSendEmailSes = ({
   mailObject,
+  verifiedCheckCommand,
   verifyEmailIdentityCommand,
   sendEmailCommand,
   ...sesSet
 }) => {
-  const verifiedCheckInput = undefined;
-  const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
-    verifiedCheckInput
-  );
-
   return sesSet.sesClient
     .send(verifiedCheckCommand)
     .then((res) => {
