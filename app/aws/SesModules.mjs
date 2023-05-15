@@ -1,5 +1,3 @@
-import { ListVerifiedEmailAddressesCommand } from "@aws-sdk/client-ses";
-
 export const verifyEmailAddressSes = async ({
   sesClient,
   verifyEmailIdentityCommand,
