@@ -78,7 +78,7 @@ export const verifyAndSendEmailSes = async ({
     .catch((err) => {
       console.error("Failed to send email.");
       console.error(err);
-      return err;
+      throw new Error(err);
     });
 };
 
@@ -109,14 +109,6 @@ export const confirmVerifiedAndSendEmailSes = async ({
     })
     .catch((err) => {
       console.error(err);
-      const awsError = {
-        statusCode: 500,
-        body: {
-          errorMessage:
-            "メール検証済みチェックに問題がありました。Lambdaのログを確認してください。",
-        },
-      };
-      const resJson = JSON.stringify(awsError);
-      throw new Error(resJson);
+      throw new Error(err);
     });
 };
