@@ -63,7 +63,7 @@ export const sendEmailSes = async ({ sesClient, sendEmailCommand }) => {
     });
 };
 
-export const verifyAndSendEmailSes = ({
+export const verifyAndSendEmailSes = async ({
   mailObject,
   verifyEmailIdentityCommand,
   sendEmailCommand,
@@ -84,7 +84,7 @@ export const verifyAndSendEmailSes = ({
     });
 };
 
-export const confirmVerifiedAndSendEmailSes = ({
+export const confirmVerifiedAndSendEmailSes = async ({
   mailObject,
   verifiedCheckCommand,
   verifyEmailIdentityCommand,
