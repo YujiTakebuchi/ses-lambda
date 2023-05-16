@@ -87,6 +87,10 @@ export const handler = (event, context, callback) => {
         sesClient,
       });
     })
+    .then((data) => {
+      console.log(data);
+      return data;
+    })
     .catch((err) => {
       console.error("Failure...! invalid values!");
       console.error(err);
