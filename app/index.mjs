@@ -11,10 +11,9 @@ import {
 } from "./validation.mjs";
 import { confirmVerifiedAndSendEmailSes } from "./aws/SesModules.mjs";
 
-const verifiedCheckInput = undefined;
-const verifiedCheckCommand = new ListVerifiedEmailAddressesCommand(
-  verifiedCheckInput
-);
+const createListVerifiedEmailAddressesCommand = (verifiedCheckInput) => {
+  return new ListVerifiedEmailAddressesCommand(verifiedCheckInput);
+};
 
 const createVerifyEmailIdentityCommand = (mailAddress) => {
   return new VerifyEmailIdentityCommand({ EmailAddress: mailAddress });
@@ -59,8 +58,11 @@ export const handler = (event, context, callback) => {
       : null,
   });
 
+  const verifiedCheckInput = undefined;
   const emailAdmin = env.EMAIL_ADMIN;
 
+  const verifiedCheckCommand =
+    createListVerifiedEmailAddressesCommand(verifiedCheckInput);
   const verifyEmailIdentityCommand =
     createVerifyEmailIdentityCommand(emailAdmin);
   const sendEmailCommand = createSendEmailCommand(
@@ -86,6 +88,10 @@ export const handler = (event, context, callback) => {
         mailAddress: emailAdmin,
         sesClient,
       });
+    })
+    .then((data) => {
+      console.log(data);
+      return data;
     })
     .catch((err) => {
       console.error("Failure...! invalid values!");
